@@ -56,7 +56,7 @@ class WaypointManager(Node):
 
     def drone_position_callback(self, msg: Odometry) -> None:
         """
-        Callback for the drone posoiton that is being publised by odometry publisher
+        Callback for the drone position that is being publised by odometry publisher
         """
         self.current_position = [ msg.pose.pose.position.x,  msg.pose.pose.position.y,  msg.pose.pose.position.z]
 
