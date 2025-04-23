@@ -10,7 +10,7 @@ from typing import List
 from rclpy.publisher import Publisher
 from rclpy.subscription import Subscription
 from nav_msgs.msg import Odometry
-from ros2_template_package.config import GOAL_STATE, WAY_PROXIMITY, WAYPOINTS
+from waypoint_manager.config import GOAL_STATE, WAY_PROXIMITY, WAYPOINTS
 from rclpy.timer import Rate
 from rclpy.timer import Timer
 from rclpy.qos import QoSProfile, QoSDurabilityPolicy, QoSHistoryPolicy, ReliabilityPolicy
