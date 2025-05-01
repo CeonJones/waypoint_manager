@@ -165,7 +165,7 @@ class GuidancePublisher(Node):
         roll_cmd = np.clip(roll_cmd, -np.deg2rad(45), np.deg2rad(45))
         print("roll_cmd", roll_cmd)
         
-        kp_pitch:float = 0.25
+        kp_pitch:float = 0.15
         pitch_cmd:float = kp_pitch * (dz)
         pitch_cmd = np.clip(pitch_cmd, -np.deg2rad(15), np.deg2rad(10))
         print("pitch_cmd", pitch_cmd)

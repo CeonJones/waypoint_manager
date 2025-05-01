@@ -31,6 +31,7 @@ class WaypointManager(Node):
 
         # ENU waypoints
         self.waypoint_list = WAYPOINTS
+        
 
 
        
@@ -63,11 +64,13 @@ class WaypointManager(Node):
         
         #print(f"Current position: {self.current_position}")
     def update_waypoint(self) -> None:
-        """
+        """S
         Check proximity, switch waypoints, and pubish to guidance publisher
         """
         if self.current_position is None:
             return
+        
+       
 
         # check distance from current position to waypoint
         dist = np.linalg.norm(np.array(self.current_position) - np.array(self.waypoint_list[self.current_waypoint_index]))
