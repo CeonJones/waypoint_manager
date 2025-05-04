@@ -15,3 +15,6 @@ WAYPOINTS = [
 
 # how close drone should be to waypoint before going to next
 WAY_PROXIMITY = 8.0
+
+# boundary drone cant go outside of
+MAX_RANGE = 80
