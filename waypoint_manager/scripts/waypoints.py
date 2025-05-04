@@ -69,6 +69,19 @@ class WaypointManager(Node):
         """
         if self.current_position is None:
             return
+
+        MAX_RANGE = 200
+        
+        home_distance =  np.linalg.norm(np.array(self.current_position[:2]))
+        
+        if home_distance > MAX_RANGE:
+            print(f"drone out of bounds")
+            msg = Odometry()
+            msg.pose.position.x = 0.0
+            msg.pose.position.y = 0.0
+            msg.pose.posotion.z = 10.0
+            self.target_publisher.publish(msg)
+            return
         
        
 
