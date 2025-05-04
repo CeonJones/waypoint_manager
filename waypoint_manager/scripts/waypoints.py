@@ -31,10 +31,7 @@ class WaypointManager(Node):
 
         # ENU waypoints
         self.waypoint_list = WAYPOINTS
-        
 
-
-       
         
         # set waypoint index 
         self.current_waypoint_index: int = 0
@@ -69,8 +66,6 @@ class WaypointManager(Node):
         """
         if self.current_position is None:
             return
-
-        MAX_RANGE = 200
         
         home_distance =  np.linalg.norm(np.array(self.current_position[:2]))
         
@@ -83,8 +78,6 @@ class WaypointManager(Node):
             self.target_publisher.publish(msg)
             return
         
-       
-
         # check distance from current position to waypoint
         dist = np.linalg.norm(np.array(self.current_position) - np.array(self.waypoint_list[self.current_waypoint_index]))
         print(f"Current wayppoint: {self.waypoint_list[self.current_waypoint_index]} and distance: {dist}")
