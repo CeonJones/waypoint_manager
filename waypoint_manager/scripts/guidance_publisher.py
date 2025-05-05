@@ -14,8 +14,7 @@ from waypoint_manager import rotation_utils as rot_utils
 from re import S
 from typing import List
 from mavros.base import SENSOR_QOS
-from PID import PID, FirstOrderFilter
-
+from waypoint_manager.PID import PID, FirstOrderFilter
 """
 For this application we will be sending roll, pitch yaw commands to the drone
 """
@@ -171,72 +170,6 @@ class GuidancePublisher(Node):
         dx:float = self.target[0] - self.current_state[0]
         dy:float = self.target[1] - self.current_state[1]
         dz:float = self.target[2] - self.current_state[2]
-        
-        dist: float = np.sqrt(dx**2 + dy**2)
-        #print("dist", dist)
-        enu_yaw_rad:float = np.arctan2(dy, dx)
-        #ned_yaw_cmd_rad:float = yaw_enu_to_ned(enu_yaw_rad)
-        ned_yaw_rad = yaw_enu_to_ned(enu_yaw_rad)
-        ned_yaw_state = yaw_enu_to_ned(self.current_state[5]) 
-        rel_yaw_cmd:float = get_relative_ned_yaw_cmd(
-            ned_yaw_state, ned_yaw_rad)
-        print("rel_yaw_cmd", rel_yaw_cmd)
-        kp:float = 0.5
-        roll_cmd:float = kp * rel_yaw_cmd
-        roll_cmd = np.clip(roll_cmd, -np.deg2rad(45), np.deg2rad(45))
-        print("roll_cmd", roll_cmd)
-        
-        kp_pitch:float = 0.15
-        pitch_cmd:float = kp_pitch * (dz)
-        pitch_cmd = np.clip(pitch_cmd, -np.deg2rad(15), np.deg2rad(10))
-        print("pitch_cmd", pitch_cmd)
-        # if dist < 0.5:
-        thrust_cmd:float = float(0.5)      
-        # create a trajectory message
-        trajectory: CtlTraj = CtlTraj()
-        trajectory.roll = [roll_cmd, roll_cmd]
-        trajectory.pitch = [pitch_cmd, pitch_cmd]
-        trajectory.yaw = [rel_yaw_cmd, rel_yaw_cmd]
-        trajectory.thrust = [thrust_cmd, thrust_cmd]
-        trajectory.idx = int(0)
-        
-        self.publish_trajectory(trajectory)
-        
-    def publish_trajectory(self, trajectory: CtlTraj) -> None:
-        """
-        Publishes the trajectory
-        """
-        ned_yaw_rad = yaw_enu_to_ned(actions[CMD_YAW_IDX])
-        ned_yaw_state = yaw_enu_to_ned(self.state_enu[YAW_IDX]) 
-        rel_yaw_cmd:float = get_relative_ned_yaw_cmd(
-            ned_yaw_state, ned_yaw_rad)
-        # rel_yaw_cmd = np.clip(
-        #     rel_yaw_cmd, -np.deg2rad(45), np.deg2rad(45))
-        rel_yaw_cmd = self.yaw_filter.filter(
-            rel_yaw_cmd)
-        # relative yaw command is already computed as error 
-        # so we set setpoint to 0.0
-        if self.roll_controller.prev_error is None:
-            self.roll_controller.prev_error = 0.0
-            
-        roll_cmd = self.roll_controller.compute(
-            setpoint=rel_yaw_cmd,
-            current_value=0.0,
-            dt=0.05
-        )
-        
-        # make sure the roll command has the same sign convention as 
-        # the yaw command
-        if rel_yaw_cmd < 0.0 and roll_cmd > 0.0:
-            roll_cmd = -roll_cmd
-        elif rel_yaw_cmd > 0.0 and roll_cmd < 0.0:
-            roll_cmd = -roll_cmd
-        # kp:float = 0.25
-        # roll_cmd:float = kp * rel_yaw_cmd
-        roll_cmd = np.clip(roll_cmd, -np.deg2rad(45), np.deg2rad(45))
-                 
-        #dz:float = ref_height - self.state_enu[Z_IDX]
-        #dz = actions[0]
         # dz is already computed in the model so set setpoint as dz
         # and the current value as 0.0
         dz = self.dz_filter.filter(dz)
@@ -251,7 +184,46 @@ class GuidancePublisher(Node):
         )
         pitch_cmd = np.clip(pitch_cmd, -np.deg2rad(12), np.deg2rad(10))
         
+        dist: float = np.sqrt(dx**2 + dy**2)
+        print("dist", dist)
+        
+        enu_yaw_rad:float = np.arctan2(dy, dx)
+        #ned_yaw_cmd_rad:float = yaw_enu_to_ned(enu_yaw_rad)
+        ned_yaw_rad = yaw_enu_to_ned(enu_yaw_rad)
+        ned_yaw_state = yaw_enu_to_ned(self.current_state[5]) 
+        rel_yaw_cmd:float = get_relative_ned_yaw_cmd(
+            ned_yaw_state, ned_yaw_rad)
+        rel_yaw_cmd = self.yaw_filter.filter(
+            rel_yaw_cmd)
+        # relative yaw command is already computed as error 
+        # so we set setpoint to 0.0
+        if self.roll_controller.prev_error is None:
+            self.roll_controller.prev_error = 0.0
+            
+        roll_cmd = self.roll_controller.compute(
+            setpoint=rel_yaw_cmd,
+            current_value=0.0,
+            dt=0.05
+        )
+        # make sure the roll command has the same sign convention as 
+        # the yaw command
+        if rel_yaw_cmd < 0.0 and roll_cmd > 0.0:
+            roll_cmd = -roll_cmd
+        elif rel_yaw_cmd > 0.0 and roll_cmd < 0.0:
+            roll_cmd = -roll_cmd
+            
+        roll_cmd = np.clip(roll_cmd, -np.deg2rad(45), np.deg2rad(45))     
+        thrust_cmd:float = float(0.5)      
+        # create a trajectory message
+        trajectory: CtlTraj = CtlTraj()
+        trajectory.roll = [roll_cmd, roll_cmd]
+        trajectory.pitch = [pitch_cmd, pitch_cmd]
+        trajectory.yaw = [rel_yaw_cmd, rel_yaw_cmd]
+        trajectory.thrust = [thrust_cmd, thrust_cmd]
+        trajectory.idx = int(0)
+        
         self.trajectory_publisher.publish(trajectory)
+        
 
 def main() -> None:
     rclpy.init()

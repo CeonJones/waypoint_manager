@@ -12,7 +12,6 @@ WAYPOINTS = [
     [0.0, 0.0, 10.0],
     ]
 
-
 # how close drone should be to waypoint before going to next
 WAY_PROXIMITY = 8.0
 

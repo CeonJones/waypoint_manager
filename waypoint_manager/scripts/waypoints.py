@@ -74,7 +74,7 @@ class WaypointManager(Node):
             msg = Odometry()
             msg.pose.position.x = 0.0
             msg.pose.position.y = 0.0
-            msg.pose.posotion.z = 10.0
+            msg.pose.position.z = 10.0
             self.target_publisher.publish(msg)
             return
         
