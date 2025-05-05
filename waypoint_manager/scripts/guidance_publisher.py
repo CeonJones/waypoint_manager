@@ -104,8 +104,8 @@ class GuidancePublisher(Node):
         
         self.roll_controller: PID = PID(
             kp=0.25, ki=0.0, kd=0.05,
-            min_constraint=np.deg2rad(-45),
-            max_constraint=np.deg2rad(45),
+            min_constraint=np.deg2rad(-40),
+            max_constraint=np.deg2rad(40),
             use_derivative=True,
             dt = 0.025)
         
@@ -212,10 +212,11 @@ class GuidancePublisher(Node):
         elif rel_yaw_cmd > 0.0 and roll_cmd < 0.0:
             roll_cmd = -roll_cmd
             
-        roll_cmd = np.clip(roll_cmd, -np.deg2rad(45), np.deg2rad(45))     
+        roll_cmd = np.clip(roll_cmd, -np.deg2rad(40), np.deg2rad(40))     
         thrust_cmd:float = float(0.5)      
         # create a trajectory message
         trajectory: CtlTraj = CtlTraj()
+        trajectory.header.stamp = self.get_clock().now().to_msg()
         trajectory.roll = [roll_cmd, roll_cmd]
         trajectory.pitch = [pitch_cmd, pitch_cmd]
         trajectory.yaw = [rel_yaw_cmd, rel_yaw_cmd]

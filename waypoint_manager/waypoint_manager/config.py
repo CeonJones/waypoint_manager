@@ -5,15 +5,13 @@ GOAL_STATE = [
     50
 ]
 
-WAYPOINTS = [
-    [0.0, 0.0, 10.0], 
-    [0.0, 50.0, 10.0], 
-    [-30.0, 0.0, 10.0],
-    [0.0, 0.0, 10.0],
+WAYPOINTS = [ 
+    [-100.0, 150.0, 55.0], 
+    [-100.0, -200.0, 55.0],
     ]
 
 # how close drone should be to waypoint before going to next
-WAY_PROXIMITY = 8.0
+WAY_PROXIMITY = 15.0
 
 # boundary drone cant go outside of
 MAX_RANGE = 80

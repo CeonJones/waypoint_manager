@@ -14,6 +14,7 @@ from waypoint_manager.config import GOAL_STATE, WAY_PROXIMITY, WAYPOINTS
 from rclpy.timer import Rate
 from rclpy.timer import Timer
 from rclpy.qos import QoSProfile, QoSDurabilityPolicy, QoSHistoryPolicy, ReliabilityPolicy
+from waypoint_manager.config import WAYPOINTS, WAY_PROXIMITY, MAX_RANGE
 
 class WaypointManager(Node):
     """
@@ -69,16 +70,20 @@ class WaypointManager(Node):
         
         home_distance =  np.linalg.norm(np.array(self.current_position[:2]))
         
-        if home_distance > MAX_RANGE:
-            print(f"drone out of bounds")
-            msg = Odometry()
-            msg.pose.position.x = 0.0
-            msg.pose.position.y = 0.0
-            msg.pose.position.z = 10.0
-            self.target_publisher.publish(msg)
-            return
+        # if home_distance > MAX_RANGE:
+        #     print(f"drone out of bounds")
+        #     msg = Odometry()
+        #     msg.pose.position.x = 0.0
+        #     msg.pose.position.y = 0.0
+        #     msg.pose.position.z = 10.0
+        #     self.target_publisher.publish(msg)
+        #     return
         
         # check distance from current position to waypoint
+        if self.current_waypoint_index >= len(self.waypoint_list):
+            print(f"All waypoints reached going back to start")
+            self.current_waypoint_index = 0
+        
         dist = np.linalg.norm(np.array(self.current_position) - np.array(self.waypoint_list[self.current_waypoint_index]))
         print(f"Current wayppoint: {self.waypoint_list[self.current_waypoint_index]} and distance: {dist}")
        
